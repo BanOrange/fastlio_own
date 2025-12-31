@@ -1,0 +1,32 @@
+<launch>
+<!-- Launch file for Livox MID360 LiDAR -->
+
+	<arg name="rviz" default="true" />
+
+	<rosparam command="load" file="$(find fast_lio)/config/myconfig.yaml" />
+
+	<param name="feature_extract_enable" type="bool" value="0"/>
+	<param name="point_filter_num" type="int" value="3"/>
+	<param name="max_iteration" type="int" value="3" />
+	<param name="filter_size_surf" type="double" value="0.5" />
+	<param name="filter_size_map" type="double" value="0.5" />
+	<param name="cube_side_length" type="double" value="1000" />
+	<param name="runtime_pos_log_enable" type="bool" value="0" />
+    <node pkg="fast_lio" type="fastlio_mapping" name="laserMapping" output="screen" /> 
+    <!-- 位姿转换节点 -->
+    <node name="pose_converter_node" pkg="fast_lio" type="pose_converter_node" output="screen">
+		<!-- 是否启用转换节点，将导航系统的位姿转到飞控话题上，默认false，不转发-->
+		<param name="if_use" value = "true" />
+        <!-- 订阅的导航位姿话题 -->
+        <param name="nav_pose_topic" value="/Odometry" />
+        <!-- 坐标系转换参数 ，填入从导航系统到机体imu的转换矩阵 -->
+        <!-- 平移：x=0，y=0，z=0 -->
+		<rosparam param="translation" >[0.0,0.0,0.0]</rosparam>
+        <!-- 绕Z轴旋转90度的旋转矩阵（行优先） -->
+		<rosparam param="rotation" >[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
+    </node>
+	<group if="$(arg rviz)">
+	<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find fast_lio)/rviz_cfg/loam_livox.rviz" />
+	</group>
+
+</launch>

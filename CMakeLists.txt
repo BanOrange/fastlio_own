@@ -51,7 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   pcl_ros
   tf
-  livox_ros_driver
+  livox_ros_driver2
   message_generation
   eigen_conversions
 )
@@ -87,3 +87,16 @@ catkin_package(
 add_executable(fastlio_mapping src/laserMapping.cpp include/ikd-Tree/ikd_Tree.cpp src/preprocess.cpp)
 target_link_libraries(fastlio_mapping ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${PYTHON_LIBRARIES})
 target_include_directories(fastlio_mapping PRIVATE ${PYTHON_INCLUDE_DIRS})
+
+# --------------------------
+# 新增：pose_converter_node节点编译
+# --------------------------
+add_executable(pose_converter_node src/odom_to_mavros.cpp)
+target_link_libraries(pose_converter_node
+  ${catkin_LIBRARIES}  
+  ${EIGEN3_LIBRARIES}  
+  ${PCL_LIBRARIES}     
+)
+install(TARGETS pose_converter_node
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

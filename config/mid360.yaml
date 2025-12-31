@@ -23,6 +23,9 @@ mapping:
                    0, 1, 0,
                    0, 0, 1]
 
+#    extrinsic_R: [ 0.766044, -0.482062,  0.408082,
+#                   0.492404,  0.852869, -0.171010,
+#                   -0.400000,  0.191342,  0.891007]
 publish:
     path_en:  false
     scan_publish_en:  true       # false: close all the point cloud output
