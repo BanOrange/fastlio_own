@@ -459,73 +459,36 @@ void Preprocess::velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
   }
 }
 
-void Preprocess::sim_handler(const sensor_msgs::PointCloud2::ConstPtr &msg) {
-    pl_surf.clear();
-    pl_full.clear();
-    pcl::PointCloud<pcl::PointXYZI> pl_orig;
-    pcl::fromROSMsg(*msg, pl_orig);
-    int plsize = pl_orig.size();
-    pl_surf.reserve(plsize);
-    for (int i = 0; i < pl_orig.points.size(); i++) {
-        double range = pl_orig.points[i].x * pl_orig.points[i].x + pl_orig.points[i].y * pl_orig.points[i].y +
-                       pl_orig.points[i].z * pl_orig.points[i].z;
-        if (range < blind * blind) continue;
-        Eigen::Vector3d pt_vec;
-        PointType added_pt;
-        added_pt.x = pl_orig.points[i].x;
-        added_pt.y = pl_orig.points[i].y;
-        added_pt.z = pl_orig.points[i].z;
-        added_pt.intensity = pl_orig.points[i].intensity;
-        added_pt.normal_x = 0;
-        added_pt.normal_y = 0;
-        added_pt.normal_z = 0;
-        added_pt.curvature = 0.0;
-        pl_surf.points.push_back(added_pt);
+void Preprocess::sim_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+{
+  pl_surf.clear();
+  pl_full.clear();
+  pcl::PointCloud<pcl::PointXYZI> pl_orig;
+  pcl::fromROSMsg(*msg, pl_orig);
+  int plsize = pl_orig.size();
+  pl_surf.reserve(plsize);
+  for (int i = 0; i < pl_orig.points.size(); i++)
+  {
+    double range = pl_orig.points[i].x * pl_orig.points[i].x + pl_orig.points[i].y * pl_orig.points[i].y +
+                   pl_orig.points[i].z * pl_orig.points[i].z;
+    if (range < blind * blind)
+      continue;
+    Eigen::Vector3d pt_vec;
+    PointType added_pt;
+    added_pt.x = pl_orig.points[i].x;
+    added_pt.y = pl_orig.points[i].y;
+    added_pt.z = pl_orig.points[i].z;
+    added_pt.intensity = pl_orig.points[i].intensity;
+    added_pt.normal_x = 0;
+    added_pt.normal_y = 0;
+    added_pt.normal_z = 0;
+    added_pt.curvature = 0.0;
+    if (i % point_filter_num == 0)
+    {
+      pl_surf.points.push_back(added_pt);
     }
+  }
 }
-
-// void Preprocess::sim_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
-// {
-//   pl_surf.clear();
-//   pl_full.clear();
-//   pcl::PointCloud<pcl::PointXYZI> pl_orig;
-//   pcl::fromROSMsg(*msg, pl_orig);
-//   int plsize = pl_orig.size();
-//   pl_surf.reserve(plsize);
-
-//   // 对点云进行体素滤波或排序以获得邻近关系
-//   pcl::PointCloud<pcl::PointXYZI> pl_ordered;
-//   // 可以按x,y坐标排序或使用体素网格
-
-//   for (int i = 1; i < pl_orig.points.size() - 1; i++)
-//   {
-//     double range = pl_orig.points[i].x * pl_orig.points[i].x +
-//                    pl_orig.points[i].y * pl_orig.points[i].y +
-//                    pl_orig.points[i].z * pl_orig.points[i].z;
-//     if (range < blind * blind)
-//       continue;
-
-//     PointType added_pt;
-//     added_pt.x = pl_orig.points[i].x;
-//     added_pt.y = pl_orig.points[i].y;
-//     added_pt.z = pl_orig.points[i].z;
-//     added_pt.intensity = pl_orig.points[i].intensity;
-
-//     // 简单曲率计算：基于前后点的距离变化
-//     Eigen::Vector3d pt_prev(pl_orig.points[i - 1].x, pl_orig.points[i - 1].y, pl_orig.points[i - 1].z);
-//     Eigen::Vector3d pt_curr(added_pt.x, added_pt.y, added_pt.z);
-//     Eigen::Vector3d pt_next(pl_orig.points[i + 1].x, pl_orig.points[i + 1].y, pl_orig.points[i + 1].z);
-
-//     Eigen::Vector3d d1 = pt_curr - pt_prev;
-//     Eigen::Vector3d d2 = pt_next - pt_curr;
-
-//     // 曲率可以定义为方向变化的角度或距离变化的比率
-//     double curvature = (d2.norm() - d1.norm()) / (d1.norm() + d2.norm() + 1e-8);
-//     added_pt.curvature = std::abs(curvature);
-
-//     pl_surf.points.push_back(added_pt);
-//   }
-// }
 
 void Preprocess::give_feature(pcl::PointCloud<PointType> &pl, vector<orgtype> &types)
 {

@@ -308,7 +308,6 @@ void standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg)
 
     PointCloudXYZI::Ptr ptr(new PointCloudXYZI());
     p_pre->process(msg, ptr);
-    cout << "process pointcloud msg" << endl;
     lidar_buffer.push_back(ptr);
     time_buffer.push_back(msg->header.stamp.toSec());
     last_timestamp_lidar = msg->header.stamp.toSec();
@@ -918,7 +917,7 @@ int main(int argc, char **argv)
     nh.param<int>("preprocess/scan_line", p_pre->N_SCANS, 16);
     nh.param<int>("preprocess/timestamp_unit", p_pre->time_unit, US);
     nh.param<int>("preprocess/scan_rate", p_pre->SCAN_RATE, 10);
-    nh.param<int>("point_filter_num", p_pre->point_filter_num, 2);
+    nh.param<int>("point_filter_num", p_pre->point_filter_num, 5);
     nh.param<bool>("feature_extract_enable", p_pre->feature_enabled, false);
     nh.param<bool>("runtime_pos_log_enable", runtime_pos_log, 0);
     nh.param<bool>("mapping/extrinsic_est_en", extrinsic_est_en, true);
@@ -1110,14 +1109,14 @@ int main(int argc, char **argv)
             double solve_H_time = 0;
             kf.update_iterated_dyn_share_modified(LASER_POINT_COV, solve_H_time);
 
-            // // 打印实时外参估计结果
-            // V3D ext_trans = state_point.offset_T_L_I;
-            // M3D ext_rot = state_point.offset_R_L_I.toRotationMatrix();
-            // ROS_INFO("Online extrinsic: T=[%f, %f, %f], R=\n[%f %f %f; %f %f %f; %f %f %f]",
-            //          ext_trans(0), ext_trans(1), ext_trans(2),
-            //          ext_rot(0, 0), ext_rot(0, 1), ext_rot(0, 2),
-            //          ext_rot(1, 0), ext_rot(1, 1), ext_rot(1, 2),
-            //          ext_rot(2, 0), ext_rot(2, 1), ext_rot(2, 2));
+            // 打印实时外参估计结果
+            V3D ext_trans = state_point.offset_T_L_I;
+            M3D ext_rot = state_point.offset_R_L_I.toRotationMatrix();
+            ROS_INFO("Online extrinsic: T=[%f, %f, %f], R=\n[%f %f %f; %f %f %f; %f %f %f]",
+                     ext_trans(0), ext_trans(1), ext_trans(2),
+                     ext_rot(0, 0), ext_rot(0, 1), ext_rot(0, 2),
+                     ext_rot(1, 0), ext_rot(1, 1), ext_rot(1, 2),
+                     ext_rot(2, 0), ext_rot(2, 1), ext_rot(2, 2));
 
             state_point = kf.get_x();
             euler_cur = SO3ToEuler(state_point.rot);
