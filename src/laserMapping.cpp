@@ -1109,14 +1109,14 @@ int main(int argc, char **argv)
             double solve_H_time = 0;
             kf.update_iterated_dyn_share_modified(LASER_POINT_COV, solve_H_time);
 
-            // 打印实时外参估计结果
-            V3D ext_trans = state_point.offset_T_L_I;
-            M3D ext_rot = state_point.offset_R_L_I.toRotationMatrix();
-            ROS_INFO("Online extrinsic: T=[%f, %f, %f], R=\n[%f %f %f; %f %f %f; %f %f %f]",
-                     ext_trans(0), ext_trans(1), ext_trans(2),
-                     ext_rot(0, 0), ext_rot(0, 1), ext_rot(0, 2),
-                     ext_rot(1, 0), ext_rot(1, 1), ext_rot(1, 2),
-                     ext_rot(2, 0), ext_rot(2, 1), ext_rot(2, 2));
+            // // 打印实时外参估计结果
+            // V3D ext_trans = state_point.offset_T_L_I;
+            // M3D ext_rot = state_point.offset_R_L_I.toRotationMatrix();
+            // ROS_INFO("Online extrinsic: T=[%f, %f, %f], R=\n[%f %f %f; %f %f %f; %f %f %f]",
+            //          ext_trans(0), ext_trans(1), ext_trans(2),
+            //          ext_rot(0, 0), ext_rot(0, 1), ext_rot(0, 2),
+            //          ext_rot(1, 0), ext_rot(1, 1), ext_rot(1, 2),
+            //          ext_rot(2, 0), ext_rot(2, 1), ext_rot(2, 2));
 
             state_point = kf.get_x();
             euler_cur = SO3ToEuler(state_point.rot);
